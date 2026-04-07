@@ -6,8 +6,8 @@ import os
 urllib3.disable_warnings()
 
 # ====== SETTINGS ======
-UP_TARGET = 4685
-DOWN_TARGET = 4683
+UP_TARGET = 4660
+DOWN_TARGET = 4653
 
 EMAIL = "ahmed.fouad@newegygold.com"
 RESEND_API_KEY = os.getenv("RESEND_API_KEY")
