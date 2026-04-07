@@ -6,16 +6,17 @@ import urllib3
 urllib3.disable_warnings()
 
 # ====== SETTINGS ======
-TARGET_PRICE = 100
-
+TARGET_PRICE = 4700   
 EMAIL = "ahmed.fouad@newegygold.com"
 PASSWORD = "fpksjcxfhssdrdcb"
+
+alert_sent = False  
 
 # ====== FUNCTIONS ======
 
 def get_gold_price():
     url = "https://api.gold-api.com/price/XAU"
-    response = requests.get(url, verify=False)  
+    response = requests.get(url, verify=False)
     data = response.json()
     return data['price']
 
@@ -36,10 +37,10 @@ while True:
         price = get_gold_price()
         print("Current price:", price)
 
-        if price >= TARGET_PRICE:
+        if price >= TARGET_PRICE and not alert_sent:
             send_email(price)
-            print("✅ Email Sent!")
-            break
+            print("✅ Alert Sent!")
+            alert_sent = True
 
         time.sleep(60)
 
