@@ -6,11 +6,14 @@ import urllib3
 urllib3.disable_warnings()
 
 # ====== SETTINGS ======
-TARGET_PRICE = 4700   
+UP_TARGET = 4685     # 📈 لما يوصل أو يعدي الرقم ده
+DOWN_TARGET = 4683   # 📉 لما ينزل تحت الرقم ده
+
 EMAIL = "ahmed.fouad@newegygold.com"
 PASSWORD = "fpksjcxfhssdrdcb"
 
-alert_sent = False  
+up_alert_sent = False
+down_alert_sent = False
 
 # ====== FUNCTIONS ======
 
@@ -20,12 +23,12 @@ def get_gold_price():
     data = response.json()
     return data['price']
 
-def send_email(price):
+def send_email(subject, body):
     server = smtplib.SMTP('smtp.office365.com', 587)
     server.starttls()
     server.login(EMAIL, PASSWORD)
 
-    message = f"Subject: Gold Alert\n\nGold price reached: {price}"
+    message = f"Subject: {subject}\n\n{body}"
 
     server.sendmail(EMAIL, EMAIL, message)
     server.quit()
@@ -37,10 +40,23 @@ while True:
         price = get_gold_price()
         print("Current price:", price)
 
-        if price >= TARGET_PRICE and not alert_sent:
-            send_email(price)
-            print("✅ Alert Sent!")
-            alert_sent = True
+        # 📈 UP ALERT
+        if price >= UP_TARGET and not up_alert_sent:
+            send_email(
+                "Gold Break Up",
+                f"Gold price reached: {price}"
+            )
+            print("📈 Up Alert Sent!")
+            up_alert_sent = True
+
+        # 📉 DOWN ALERT
+        if price <= DOWN_TARGET and not down_alert_sent:
+            send_email(
+                "Gold Break Down",
+                f"Gold price dropped: {price}"
+            )
+            print("📉 Down Alert Sent!")
+            down_alert_sent = True
 
         time.sleep(60)
 
