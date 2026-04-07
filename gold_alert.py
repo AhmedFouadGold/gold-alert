@@ -12,6 +12,8 @@ DOWN_TARGET = 4683   # 📉 لما ينزل تحت الرقم ده
 EMAIL = "ahmed.fouad@newegygold.com"
 PASSWORD = "fpksjcxfhssdrdcb"
 
+TEST_MODE = True  # 👈 هيبعت تيست أول ما يشتغل
+
 up_alert_sent = False
 down_alert_sent = False
 
@@ -39,6 +41,15 @@ while True:
     try:
         price = get_gold_price()
         print("Current price:", price)
+
+        # 🔥 TEST MODE (مرة واحدة بس)
+        if TEST_MODE:
+            send_email(
+                "TEST EMAIL",
+                f"System is working. Current price: {price}"
+            )
+            print("✅ Test Email Sent!")
+            TEST_MODE = False
 
         # 📈 UP ALERT
         if price >= UP_TARGET and not up_alert_sent:
