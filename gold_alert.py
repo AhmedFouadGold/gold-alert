@@ -1,7 +1,7 @@
 import requests
 import time
-import smtplib
 import urllib3
+import os
 
 urllib3.disable_warnings()
 
@@ -10,9 +10,7 @@ UP_TARGET = 4685
 DOWN_TARGET = 4683
 
 EMAIL = "ahmed.fouad@newegygold.com"
-PASSWORD = "fpksjcxfhssdrdcb"
-
-TEST_MODE = True
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
 
 up_alert_sent = False
 down_alert_sent = False
@@ -26,18 +24,25 @@ def get_gold_price():
     return data['price']
 
 def send_email(subject, body):
-    print("📩 Trying to send email...")
+    print("📩 Sending email via Resend...")
 
-    server = smtplib.SMTP('smtp.office365.com', 587)
-    server.starttls()
-    server.login(EMAIL, PASSWORD)
+    url = "https://api.resend.com/emails"
 
-    message = f"Subject: {subject}\n\n{body}"
+    headers = {
+        "Authorization": f"Bearer {RESEND_API_KEY}",
+        "Content-Type": "application/json"
+    }
 
-    server.sendmail(EMAIL, EMAIL, message)
-    server.quit()
+    data = {
+        "from": "onboarding@resend.dev",
+        "to": EMAIL,
+        "subject": subject,
+        "html": f"<p>{body}</p>"
+    }
 
-    print("✅ Email Sent!")
+    response = requests.post(url, json=data, headers=headers)
+
+    print("📩 Response:", response.status_code, response.text)
 
 # ====== LOOP ======
 
@@ -48,22 +53,12 @@ while True:
         price = get_gold_price()
         print("Current price:", price)
 
-        # 🔥 TEST MODE (إجباري مرة واحدة)
-        if TEST_MODE:
-            send_email(
-                "TEST FROM RAILWAY",
-                f"System is working. Current price: {price}"
-            )
-            print("🔥 TEST SENT")
-            TEST_MODE = False
-
         # 📈 UP ALERT
         if price >= UP_TARGET and not up_alert_sent:
             send_email(
                 "Gold Break Up",
                 f"Gold price reached: {price}"
             )
-            print("📈 Up Alert Sent!")
             up_alert_sent = True
 
         # 📉 DOWN ALERT
@@ -72,7 +67,6 @@ while True:
                 "Gold Break Down",
                 f"Gold price dropped: {price}"
             )
-            print("📉 Down Alert Sent!")
             down_alert_sent = True
 
         time.sleep(60)
