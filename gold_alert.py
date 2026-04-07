@@ -6,13 +6,13 @@ import urllib3
 urllib3.disable_warnings()
 
 # ====== SETTINGS ======
-UP_TARGET = 4685     # 📈 لما يوصل أو يعدي الرقم ده
-DOWN_TARGET = 4683   # 📉 لما ينزل تحت الرقم ده
+UP_TARGET = 4685
+DOWN_TARGET = 4683
 
 EMAIL = "ahmed.fouad@newegygold.com"
 PASSWORD = "fpksjcxfhssdrdcb"
 
-TEST_MODE = True  # 👈 هيبعت تيست أول ما يشتغل
+TEST_MODE = True
 
 up_alert_sent = False
 down_alert_sent = False
@@ -26,6 +26,8 @@ def get_gold_price():
     return data['price']
 
 def send_email(subject, body):
+    print("📩 Trying to send email...")
+
     server = smtplib.SMTP('smtp.office365.com', 587)
     server.starttls()
     server.login(EMAIL, PASSWORD)
@@ -35,20 +37,24 @@ def send_email(subject, body):
     server.sendmail(EMAIL, EMAIL, message)
     server.quit()
 
+    print("✅ Email Sent!")
+
 # ====== LOOP ======
+
+print("🚀 Script started")
 
 while True:
     try:
         price = get_gold_price()
         print("Current price:", price)
 
-        # 🔥 TEST MODE (مرة واحدة بس)
+        # 🔥 TEST MODE (إجباري مرة واحدة)
         if TEST_MODE:
             send_email(
-                "TEST EMAIL",
+                "TEST FROM RAILWAY",
                 f"System is working. Current price: {price}"
             )
-            print("✅ Test Email Sent!")
+            print("🔥 TEST SENT")
             TEST_MODE = False
 
         # 📈 UP ALERT
@@ -72,5 +78,5 @@ while True:
         time.sleep(60)
 
     except Exception as e:
-        print("Error:", e)
+        print("❌ Error:", e)
         time.sleep(60)
